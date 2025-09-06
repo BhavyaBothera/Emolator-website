@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emolator - Speech to Emotion</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Floating emoji background -->
+  <div id="emoji-container"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">Emolator</div>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#emotion">Emotions</a></li>
+      <li><a href="#history">History</a></li>
+      <li><a href="#insights">Insights</a></li>
+    </ul>
+    <div class="nav-controls">
+      <button id="darkModeBtn" title="Toggle dark mode">🌙</button>
+      <button id="fontPlus" title="Increase font">A+</button>
+      <button id="fontMinus" title="Decrease font">A−</button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Speech to Emotion</h1>
+    <p>Real-time speech recognition with emotional understanding</p>
+    <canvas id="visualizerCanvas" height="60"></canvas>
+    <div class="mic-area">
+      <button class="mic-btn" id="micBtn" aria-pressed="false" title="Start/Stop listening">
+        <span id="micIcon">🎤</span>
+      </button>
+      <div id="micStatus" class="mic-status"></div>
+    </div>
+    <p>
+      Select Language:
+      <select id="langSelect">
+        <option value="en-US">English</option>
+        <option value="hi-IN">Hindi</option>
+        <option value="es-ES">Spanish</option>
+      </select>
+    </p>
+    <p>Click the mic to start/stop listening.</p>
+  </section>
+
+  <!-- Captions Section -->
+  <section class="captions" id="captionsBox" aria-live="polite">
+    <div class="caption placeholder">No speech yet...</div>
+  </section>
+
+  <!-- Cards Section -->
+  <section class="cards">
+    <div id="updates-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Emotions -->
+    <div class="card" id="emotion">
+      <h3>😊 Emotions</h3>
+      <p>Overall emotion frequency.</p>
+      <ul id="statsList">
+        <li>😊 Happy: <span id="happyStat">0%</span></li>
+        <li>😔 Sad: <span id="sadStat">0%</span></li>
+        <li>😡 Angry: <span id="angryStat">0%</span></li>
+        <li>😐 Neutral: <span id="neutralStat">0%</span></li>
+      </ul>
+      <div class="chart-wrap">
+        <canvas id="emotionChart" width="200" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="card" id="history">
+      <h3>📜 History</h3>
+      <input type="search" id="historySearch" placeholder="Search history..." />
+      <p>Conversations from the selected period:</p>
+      <ul id="historyList"></ul>
+      <button id="downloadBtn" class="download-btn">⬇ Export as CSV</button>
+    </div>
+
+    <!-- Insights -->
+    <div class="card" id="insights">
+      <h3>🌍 Insights</h3>
+      <p>Emotional trend over time:</p>
+      <div class="insight-filters">
+        <button class="filter-btn" data-filter="3600000">1H</button>
+        <button class="filter-btn" data-filter="86400000">24H</button>
+        <button class="filter-btn active" data-filter="259200000">3D</button>
+        <button class="filter-btn" data-filter="604800000">1W</button>
+        <button class="filter-btn" data-filter="2592000000">1M</button>
+      </div>
+      <div class="chart-wrap-large">
+        <canvas id="trendChart"></canvas>
+      </div>
+      <hr>
+      <p>Your most frequently used words:</p>
+      <canvas id="wordCloudCanvas" width="300" height="200"></canvas>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 Emolator. All rights reserved.
+  </footer>
+
+  <!-- Libraries & Script -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="sentiment.local.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/wordcloud@1.2.2/src/wordcloud2.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
