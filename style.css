@@ -82,7 +82,56 @@ footer { text-align:center; padding:18px; background: #f1f3f8; color:#666; }
 .filter-btn.active { background-color: var(--accent); color:white; }
 
 /* Responsive */
-@media (max-width:900px) { .cards { flex-direction:column; width:92%; gap:14px; } .captions { width:92%; } }
+@media (max-width: 900px) {
+  /* --- General Font & Layout --- */
+  body {
+    font-size: 15px; /* Adjust base font size for better mobile readability */
+  }
+
+  /* --- Navigation Bar --- */
+  nav {
+    flex-wrap: wrap;       /* Allow nav items to wrap onto a new line */
+    justify-content: center; /* Center the items when they wrap */
+    gap: 15px;
+  }
+
+  nav ul {
+    order: 3; /* Push the text links to appear last if the nav wraps */
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* --- Hero Section --- */
+  .hero h1 {
+    font-size: 24px; /* Make the main title smaller on mobile */
+  }
+
+  .mic-btn {
+    width: 72px; /* Make the mic button a bit smaller */
+    height: 72px;
+  }
+
+  .mic-btn span {
+    font-size: 32px; /* Make the mic icon smaller to match the button */
+  }
+
+  /* --- Captions Box --- */
+  .captions {
+    width: 92%;
+    max-height: 200px; /* Reduce max height on smaller screens */
+  }
+
+  /* --- Cards Section --- */
+  .cards {
+    flex-direction: column; /* Stack the cards vertically (your original rule) */
+    width: 92%;
+    gap: 16px; /* Adjust the gap between stacked cards */
+  }
+
+  .card {
+    padding: 16px; /* Slightly reduce padding inside cards */
+  }
+}
 
 /* Floating Emoji Background */
 #emoji-container { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; pointer-events:none; }
