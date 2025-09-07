@@ -179,22 +179,35 @@ footer { text-align:center; padding:18px; background: #f1f3f8; color:#666; }
 .filter-btn:hover { background-color: rgba(79,70,229,0.1); }
 .filter-btn.active { background-color: var(--accent); color:white; }
 
-/* Floating emoji background */
+/* Emoji Bursts */
 #emoji-container {
-  position: fixed; top:0; left:0;
-  width:100%; height:100%;
-  z-index:-1; overflow:hidden; pointer-events:none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    overflow: hidden;
+    pointer-events: none;
 }
-.emoji {
-  position:absolute; bottom:-50px;
-  font-size:2rem;
-  opacity:0;
-  animation: float-up 10s linear infinite;
+
+.emoji-burst {
+    position: absolute;
+    will-change: transform;
+    animation: emoji-burst-animation var(--duration, 1s) ease-out forwards;
 }
-@keyframes float-up {
-  0% { transform:translateY(0); opacity:1; }
-  100% { transform:translateY(-100vh); opacity:0; }
+
+@keyframes emoji-burst-animation {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(var(--angle)) translateY(calc(-1 * var(--distance))) scale(0);
+        opacity: 0;
+    }
 }
+
 
 /* --- UTILITY CLASSES --- */
 .mic-status.error {

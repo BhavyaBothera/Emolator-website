@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- LocalStorage Helpers ---
   function savePref(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } 
+    try { localStorage.setItem(key, JSON.stringify(value)); }
     catch (e) { console.error("Could not save pref:", e); }
   }
 
@@ -59,8 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
     neutral: { emoji: "😐", color: "var(--neutral-color)", value: 0 }
   };
 
-  function getCssVar(name) { 
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); 
+  function getCssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   // --- Chart Initialization ---
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
     history.push({ text, emoji, emotionKey, time: Date.now() });
     savePref("emolator_history", history.filter(item => (Date.now()-item.time)<30*24*60*60*1000));
   }
-  
+
   // --- Central Dashboard Update Function ---
   function updateDashboard(timeFilterMs) {
     const history = loadPref("emolator_history", []);
@@ -171,10 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if(langSelect) recognition.lang = langSelect.value;
 
     recognition.onstart = () => { isListening = true; updateMicState(); setupAudioVisualizer(); };
-    recognition.onend = () => { 
-        isListening = false; 
-        updateMicState(); 
-        stopAudioVisualizer(); 
+    recognition.onend = () => {
+        isListening = false;
+        updateMicState();
+        stopAudioVisualizer();
         micBtn.focus();
     };
 
@@ -208,8 +208,9 @@ document.addEventListener("DOMContentLoaded", () => {
             captionsBox.scrollTop=captionsBox.scrollHeight;
           }
 
+          triggerEmojiBurst(emotions[emotionKey].emoji);
           saveToHistory(text, emotions[emotionKey].emoji, emotionKey);
-          
+
           const activeFilter = insightFilters?.querySelector('.active');
           if (activeFilter) {
             updateDashboard(parseInt(activeFilter.dataset.filter));
@@ -382,18 +383,31 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.lineTo(visualizerCanvas.width,visualizerCanvas.height/2); ctx.stroke();
   }
 
-  // --- Floating Emoji Background ---
-  if(emojiContainer){
-    const emojis=['😊','😔','😡','😐','🎤','🎙️'];
-    function createEmoji(){
-      const e=document.createElement('span'); e.className='emoji';
-      e.innerText=emojis[Math.floor(Math.random()*emojis.length)];
-      e.style.left=`${Math.random()*100}vw`; e.style.fontSize=`${Math.random()*2+1}rem`;
-      const dur=Math.random()*10+5; e.style.animationDuration=`${dur}s`;
-      emojiContainer.appendChild(e); setTimeout(()=>e.remove(),dur*1000);
+  // --- Emoji Bursts ---
+  function triggerEmojiBurst(emoji) {
+    if (!emojiContainer) return;
+    const burstCount = 20;
+    for (let i = 0; i < burstCount; i++) {
+        const e = document.createElement('span');
+        e.className = 'emoji-burst';
+        e.innerText = emoji;
+        e.style.left = '50vw';
+        e.style.top = '50vh';
+        e.style.fontSize = `${Math.random() * 1.5 + 1}rem`;
+
+        const angle = Math.random() * 360;
+        const distance = Math.random() * 150 + 50;
+        const duration = Math.random() * 1 + 0.5;
+
+        e.style.setProperty('--angle', angle + 'deg');
+        e.style.setProperty('--distance', distance + 'px');
+        e.style.setProperty('--duration', duration + 's');
+
+        emojiContainer.appendChild(e);
+        setTimeout(() => e.remove(), duration * 1000);
     }
-    setInterval(createEmoji,300);
   }
+
 
   // --- Trend Chart ---
   function updateTrendChart(timeFilterMs=259200000){
@@ -418,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const theme=loadPref("emolator_theme","light");
     const font=loadPref("emolator_font",16); document.body.style.fontSize=`${font}px`;
     applyTheme(theme);
-    
+
     const activeFilter = insightFilters?.querySelector('.active');
     const initialTimeFilter = activeFilter ? parseInt(activeFilter.dataset.filter) : 259200000; // Default to 3 days
     updateDashboard(initialTimeFilter);
