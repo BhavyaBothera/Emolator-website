@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isListening = false;
   let recognition;
   let emotionChart, trendChart;
+  let mediaStream; // To hold the microphone stream
 
   // --- LocalStorage Helpers ---
   function savePref(key, value) {
@@ -162,6 +163,22 @@ document.addEventListener("DOMContentLoaded", () => {
     updateWordCloud(filteredHistory);
   }
 
+  // --- Browser Support Handling ---
+  function handleUnsupportedBrowser() {
+      if (micBtn) micBtn.style.display = 'none';
+      if (micStatus) micStatus.style.display = 'none';
+      
+      const heroContent = document.querySelector('.hero');
+      const langSelector = document.getElementById('langSelect');
+      if(langSelector) langSelector.parentElement.style.display = 'none';
+
+      if (heroContent) {
+          const errorP = heroContent.querySelector('p');
+          if(errorP) errorP.innerHTML = 'Sorry, your browser does not support the Web Speech API.<br>Please use Chrome on a desktop or Android device.';
+      }
+  }
+
+
   // --- Speech Recognition ---
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(SpeechRecognition) {
@@ -170,11 +187,15 @@ document.addEventListener("DOMContentLoaded", () => {
     recognition.interimResults = true;
     if(langSelect) recognition.lang = langSelect.value;
 
-    recognition.onstart = () => { isListening = true; updateMicState(); setupAudioVisualizer(); };
+    recognition.onstart = () => { isListening = true; updateMicState(); };
     recognition.onend = () => {
         isListening = false;
         updateMicState();
         stopAudioVisualizer();
+        if (mediaStream) {
+            mediaStream.getTracks().forEach(track => track.stop());
+            mediaStream = null;
+        }
         micBtn.focus();
     };
 
@@ -235,8 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
   } else {
-    if(micStatus) micStatus.textContent="Speech API not supported.";
-    if(micBtn) micBtn.disabled=true;
+    handleUnsupportedBrowser();
   }
 
   // --- Mic Button ---
@@ -248,10 +268,40 @@ document.addEventListener("DOMContentLoaded", () => {
     micIcon.textContent = isListening ? "🎙️" : "🎤";
   }
 
+  async function startListening() {
+      if (isListening || !recognition) return;
+      try {
+          // Request microphone access once
+          mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          
+          // If successful, start the visualizer with the stream
+          setupAudioVisualizer(mediaStream);
+          
+          // And start speech recognition
+          if(langSelect) recognition.lang = langSelect.value;
+          recognition.start();
+
+      } catch (e) {
+          console.error("Mic access failed", e);
+          if(micStatus){
+            micStatus.textContent = "Mic access denied. HTTPS is required.";
+            micStatus.classList.add("error");
+          }
+          if (micBtn) micBtn.disabled = true;
+      }
+  }
+
+  function stopListening() {
+      if (!isListening || !recognition) return;
+      recognition.stop();
+  }
+
   if(micBtn) micBtn.addEventListener("click", ()=>{
-    if(!recognition) return;
-    if(!isListening){ if(langSelect) recognition.lang=langSelect.value; recognition.start(); }
-    else recognition.stop();
+    if(!isListening) {
+        startListening();
+    } else {
+        stopListening();
+    }
   });
 
   // --- History Search ---
@@ -341,25 +391,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Audio Visualizer ---
-  let audioContext, analyser, source, animationFrameId;
-  async function setupAudioVisualizer(){
-    if (!visualizerCanvas || !micStatus) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      micStatus.classList.remove("error");
-      micStatus.textContent = isListening ? "Listening..." : "Idle";
-
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      analyser = audioContext.createAnalyser();
-      source = audioContext.createMediaStreamSource(stream);
-      source.connect(analyser);
-      drawVisualizer();
-    } catch (e) {
-      console.error("Mic access failed", e);
-      micStatus.textContent = "Mic access denied.";
-      micStatus.classList.add("error");
-      if (micBtn) micBtn.disabled = true;
-    }
+  let audioContext, analyser, animationFrameId;
+  function setupAudioVisualizer(stream){
+    if (!visualizerCanvas || !stream) return;
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    drawVisualizer();
   }
 
   function stopAudioVisualizer(){
@@ -428,14 +467,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Initialization ---
   function init(){
-    initializeCharts();
-    const theme=loadPref("emolator_theme","light");
-    const font=loadPref("emolator_font",16); document.body.style.fontSize=`${font}px`;
-    applyTheme(theme);
-
-    const activeFilter = insightFilters?.querySelector('.active');
-    const initialTimeFilter = activeFilter ? parseInt(activeFilter.dataset.filter) : 259200000; // Default to 3 days
-    updateDashboard(initialTimeFilter);
+    // Only initialize the main app features if the browser is supported
+    if (SpeechRecognition) {
+      initializeCharts();
+      const theme=loadPref("emolator_theme","light");
+      const font=loadPref("emolator_font",16); document.body.style.fontSize=`${font}px`;
+      applyTheme(theme);
+      
+      const activeFilter = insightFilters?.querySelector('.active');
+      const initialTimeFilter = activeFilter ? parseInt(activeFilter.dataset.filter) : 259200000; // Default to 3 days
+      updateDashboard(initialTimeFilter);
+    }
   }
 
   init();
