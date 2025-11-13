@@ -69,6 +69,56 @@ nav ul li a { text-decoration:none; color: inherit; font-weight:500; }
   color: var(--text);
 }
 
+/* --- Modern Dropdown Styling --- */
+#langSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: var(--card);
+  color: var(--text);
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  padding: 10px 40px 10px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  outline: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%234f46e5" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+#langSelect:hover {
+  background-color: rgba(79, 70, 229, 0.06);
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.15);
+}
+
+#langSelect:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+#langSelect option {
+  background-color: var(--card);
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Dark theme handling for dropdown */
+body.dark #langSelect {
+  background-color: var(--card);
+  color: var(--text);
+  border-color: var(--accent);
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23a5b4fc" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+}
+
+body.dark #langSelect:hover {
+  background-color: rgba(79, 70, 229, 0.12);
+  box-shadow: 0 0 8px rgba(79, 70, 229, 0.25);
+}
+
 /* --- Hero Section --- */
 .hero {
   text-align:center;
