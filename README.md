@@ -36,7 +36,7 @@ This project is a static front-end application and requires no server.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [Your Repository URL]
+    git clone https://github.com/bhavyabothera/Emolator-website
     cd Emolator-website
     ```
 2.  **Open in Browser:** Simply open the `index.html` file in a modern web browser that supports the **Web Speech API**.
